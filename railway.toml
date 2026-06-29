@@ -1,9 +1,0 @@
-[backend]
-  build = "backend/Dockerfile"
-  [backend.deploy]
-    restartPolicyType = "ON_FAILURE"
-
-[frontend]
-  build = "frontend/Dockerfile"
-  [frontend.deploy]
-    restartPolicyType = "ON_FAILURE"

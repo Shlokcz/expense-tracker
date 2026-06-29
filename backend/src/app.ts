@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
 
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -11,9 +12,9 @@ import { logger } from './utils/logger';
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || '*',
   credentials: true,
 }));
 app.use(compression());
@@ -35,6 +36,12 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 app.use('/api', routes);
+
+const frontendPath = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(frontendPath));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 app.use(notFoundHandler);
 app.use(errorHandler);
