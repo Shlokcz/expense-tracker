@@ -1,0 +1,39 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String      @id @default(cuid())
+  email     String      @unique
+  name      String
+  password  String
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  expenses  Expense[]
+
+  @@map("users")
+}
+
+model Expense {
+  id       String   @id @default(cuid())
+  userId   String   @map("user_id")
+  desc     String
+  amount   Float
+  category String
+  type     String   @default("expense")
+  date     DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, category])
+  @@index([userId, date])
+  @@map("expenses")
+}
